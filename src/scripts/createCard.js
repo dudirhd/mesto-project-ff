@@ -18,7 +18,6 @@ export function createCard(item, deleteCardFunction) {
     cardLike.classList.toggle('card__like-button_is-active');
   })
 
-  cardPopup.classList.add('popup_is-animated');
   cardImage.src = item.link;
   cardImage.alt = item.name;
   cardTitle.textContent = item.name;
