@@ -25,6 +25,7 @@ export function createCard(item, deleteCardFunction) {
   cardImage.addEventListener('click', function() {
     openPopupFunc(cardPopup);
     cardImagePopup.src = cardImage.src;
+    cardImagePopup.alt = cardTitle.textContent;
     cardNamePopup.textContent = cardTitle.textContent;
   });
 
