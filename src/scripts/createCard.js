@@ -1,8 +1,9 @@
+import { cardPopupFunc } from "..";
 import { openPopupFunc } from "./popupFuncs";
 
 export const cardTemplate = document.querySelector('#card-template').content;
 
-export function createCard(item, deleteCardFunction) {
+export function createCard(item, deleteCardFunction, openPopupFunc, cardLikeFunc) {
   const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
   const cardImage = cardElement.querySelector('.card__image');
   const deleteButton = cardElement.querySelector('.card__delete-button');
@@ -14,25 +15,21 @@ export function createCard(item, deleteCardFunction) {
 
   deleteButton.addEventListener('click', deleteCardFunction); 
 
-  cardLike.addEventListener('click', function() {
-    cardLike.classList.toggle('card__like-button_is-active');
-  })
+  cardLike.addEventListener('click', cardLikeFunc);
 
   cardImage.src = item.link;
   cardImage.alt = item.name;
   cardTitle.textContent = item.name;
 
-  cardImage.addEventListener('click', function() {
-    openPopupFunc(cardPopup);
-    cardImagePopup.src = cardImage.src;
-    cardImagePopup.alt = cardTitle.textContent;
-    cardNamePopup.textContent = cardTitle.textContent;
-  });
-
+  cardImage.addEventListener('click', openPopupFunc);
   return cardElement;
 }
 
 export function deleteCardFunction(cardElement) { 
   const itemRemove = cardElement.target.closest('.card'); 
   itemRemove.remove(); 
+}
+
+export function cardLikeFunc(evt) {
+  evt.target.classList.toggle('card__like-button_is-active');
 }

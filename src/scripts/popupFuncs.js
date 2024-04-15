@@ -1,6 +1,6 @@
 //Открыть попап
 export function openPopupFunc(element) {
-  element.classList.toggle('popup_is-opened');
+  element.classList.add('popup_is-opened');
   document.addEventListener('keydown', closePopupByEsc);
 }
 //Закрыть по Esc
@@ -12,7 +12,7 @@ export function closePopupByEsc(event) {
 //Закрыть попап
 export function closePopupFunction(evt) {
   if (evt.target.classList.contains('popup__close') || evt.target.classList.contains("popup")) {
-    evt.currentTarget.classList.toggle('popup_is-opened');
+    evt.currentTarget.classList.remove('popup_is-opened');
     document.removeEventListener('keydown', closePopupByEsc);
   }
 }

@@ -1,12 +1,12 @@
 import './pages/index.css';
 import {initialCards} from './scripts/cards.js';
-import { createCard, deleteCardFunction } from './scripts/createCard.js';
+import { createCard, deleteCardFunction, cardLikeFunc } from './scripts/createCard.js';
 import {openPopupFunc, closePopupFunction} from './scripts/popupFuncs.js';
 //дом - карточки
 const placesList = document.querySelector('.places__list');
 //инициализация карточек
 initialCards.forEach(item => {
-  const card = createCard(item, deleteCardFunction);
+  const card = createCard(item, deleteCardFunction, cardPopupFunc, cardLikeFunc);
   placesList.append(card);
 })
 //Дом для кнопок и попапов
@@ -64,3 +64,14 @@ function handleFormSubmitCard(evt) {
 //Добавление обработчиков к формам
 formPofile.addEventListener('submit', handleFormSubmitInfo);
 formNewCard.addEventListener('submit', handleFormSubmitCard);
+
+const cardPopup = document.querySelector('.popup_type_image');
+const cardImagePopup = document.querySelector('.popup__image');
+const cardNamePopup = document.querySelector('.popup__caption');
+
+export function cardPopupFunc(evt) {
+  cardImagePopup.src = evt.target.src;
+  cardImagePopup.alt = evt.target.alt;
+  cardNamePopup.textContent = evt.target.alt;
+  openPopupFunc(cardPopup);
+}
