@@ -10,9 +10,14 @@ export function closePopupByEsc(event) {
   }
 }
 //Закрыть попап
-export function closePopupFunction(evt) {
+export function closePopupByOverlay(evt) {
   if (evt.target.classList.contains('popup__close') || evt.target.classList.contains("popup")) {
-    evt.currentTarget.classList.remove('popup_is-opened');
+    closePopupFunc(evt.currentTarget);
     document.removeEventListener('keydown', closePopupByEsc);
   }
 }
+
+export function closePopupFunc(element) { 
+  element.classList.remove('popup_is-opened'); 
+  document.removeEventListener('keydown', closePopupByEsc); 
+} 

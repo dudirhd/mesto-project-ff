@@ -1,7 +1,7 @@
 import './pages/index.css';
 import {initialCards} from './scripts/cards.js';
 import { createCard, deleteCardFunction, cardLikeFunc } from './scripts/createCard.js';
-import {openPopupFunc, closePopupFunction} from './scripts/popupFuncs.js';
+import {openPopupFunc, closePopupFunc, closePopupByOverlay} from './scripts/popupFuncs.js';
 //дом - карточки
 const placesList = document.querySelector('.places__list');
 //инициализация карточек
@@ -39,7 +39,7 @@ profileAddButton.addEventListener('click', function() {
 //Каждой кнопке крестик и фону передается функция закрытия при клике
 popups.forEach((popup) => {
   popup.classList.add('popup_is-animated');
-  popup.addEventListener('click', closePopupFunction);
+  popup.addEventListener('click', closePopupByOverlay);
 })
 //Редактирование Имени и работы
 function handleFormSubmitInfo(evt) {
