@@ -9,6 +9,7 @@ export function createCard(item, deleteCardFunction, openPopupFunc, cardLikeFunc
   const deleteButton = cardElement.querySelector('.card__delete-button');
   const cardTitle = cardElement.querySelector('.card__title');
   const cardLike = cardElement.querySelector('.card__like-button');
+  const cardLikeNum = cardElement.querySelector('.card__like-num')
   const cardPopup = document.querySelector('.popup_type_image');
   const cardImagePopup = document.querySelector('.popup__image');
   const cardNamePopup = document.querySelector('.popup__caption');
@@ -20,7 +21,7 @@ export function createCard(item, deleteCardFunction, openPopupFunc, cardLikeFunc
   cardImage.src = item.link;
   cardImage.alt = item.name;
   cardTitle.textContent = item.name;
-
+  cardLikeNum.textContent = item.likes.length;
   cardImage.addEventListener('click', openPopupFunc);
   return cardElement;
 }
