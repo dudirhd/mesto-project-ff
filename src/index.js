@@ -1,5 +1,4 @@
 import './pages/index.css';
-import {initialCards} from './scripts/cards.js';
 import { createCard, deleteCardFunction, cardLikeFunc } from './scripts/createCard.js';
 import {openPopupFunc, closePopupFunc, closePopupByOverlay} from './scripts/popupFuncs.js';
 //дом - карточки
@@ -25,6 +24,7 @@ const cardNewUrl = document.querySelector('.popup__input_type_url');
 
 const formPofile = nameInput.closest('.popup__form');
 const formNewCard = cardNewName.closest('.popup__form');  
+
 //Открытие попапа смены имени
 editButton.addEventListener('click', function() {
   nameInput.value = profileTitle.textContent;
@@ -36,6 +36,8 @@ profileAddButton.addEventListener('click', function() {
   openPopupFunc(popupNewCard);
   formNewCard.reset();
 });
+
+
 //Каждой кнопке крестик и фону передается функция закрытия при клике
 popups.forEach((popup) => {
   popup.classList.add('popup_is-animated');
@@ -44,6 +46,7 @@ popups.forEach((popup) => {
 //Редактирование Имени и работы
 function handleFormSubmitInfo(evt) {
   evt.preventDefault();
+  isRenderingFunc(evt.submitter, true)
   document.querySelector('.profile__title').textContent = nameInput.value;
   document.querySelector('.profile__description').textContent = jobInput.value;
   fetch('https://nomoreparties.co/v1/wff-cohort-12/users/me', {
@@ -59,6 +62,7 @@ function handleFormSubmitInfo(evt) {
   }) 
     .then(res => res.json())
     .then((result) => {
+      isRenderingFunc(evt.submitter, false)
       console.log(result);
     })
   closePopupFunc(document.querySelector('.popup_is-opened'));
@@ -66,6 +70,7 @@ function handleFormSubmitInfo(evt) {
 //Добавление новой карточки
 function handleFormSubmitCard(evt) {
   evt.preventDefault();
+  isRenderingFunc(evt.submitter, true)
   const objNewCard = ({
     name: cardNewName.value,
     link: cardNewUrl.value
@@ -83,22 +88,59 @@ function handleFormSubmitCard(evt) {
     })
   })
     .then(res => res.json())
-    .then((data) => {
-      console.log(data)
+    .then((result) => {
+      console.log(result)
+      isRenderingFunc(evt.submitter, false)
     })
     .catch((error) => {
       console.log(error)
     })
-    // .then((result) => {
-    //   console.log(result)
-    // })
   const newCard = createCard(objNewCard, deleteCardFunction);
   placesList.prepend(newCard);
   closePopupFunc(popupNewCard);
 }
+const newAvatarUrl = document.querySelector('.popup__input_type_url-avatar')
+const profileImage = document.querySelector('.profile__image')
+const editAvatarPopup = document.querySelector('.popup_type_edit-avatar')
+const formAvatar = newAvatarUrl.closest('.popup__form')
+function handleFormChangeAvatar(evt) {
+  evt.preventDefault();
+  console.log('thaTSIT')
+  const newAvatar = newAvatarUrl.value
+  isRenderingFunc(evt.submitter, true)
+  fetch('https://nomoreparties.co/v1/wff-cohort-12/users/me/avatar', {
+    method: 'PATCH',    
+    headers: {
+      'Content-Type': 'application/json',
+      'authorization': '27e1782a-9848-48d5-811f-a412253546cd'
+    },
+    body: JSON.stringify({
+      avatar: newAvatar
+    })
+  })
+    .then((res) => {
+      console.log(res)
+      res.json()
+    })
+    .then((result) => {
+      console.log(result)
+      profileImage.style = `background-image: url(${newAvatar})`;
+      isRenderingFunc(evt.submitter, false)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  closePopupFunc(editAvatarPopup);
+}
+
+profileImage.addEventListener('click', function() {
+  openPopupFunc(editAvatarPopup);
+})
 //Добавление обработчиков к формам
 formPofile.addEventListener('submit', handleFormSubmitInfo);
 formNewCard.addEventListener('submit', handleFormSubmitCard);
+formAvatar.addEventListener('submit',handleFormChangeAvatar);
+
 
 const cardPopup = document.querySelector('.popup_type_image');
 const cardImagePopup = document.querySelector('.popup__image');
@@ -192,7 +234,7 @@ const config = {
 }
 
 //запрос профиля по токену
-const profileImage = document.querySelector('.profile__image')
+
 fetch(`${config.baseURL}/users/me `, {
   headers: config.headers,
   method: config.methodGet
@@ -200,9 +242,10 @@ fetch(`${config.baseURL}/users/me `, {
 .then(res => res.json())
 .then((result) => {
   //Замена данными из запроса
+  console.log(result)
   profileTitle.textContent = result.name;
   profileDescription.textContent = result.about
-  profileImage.style.backgroundImage = result.avatar;
+  profileImage.style = `background-image: url(${result.avatar})`;
 }); 
 //Все карточки
 fetch(`${config.baseURL}/cards `, {
@@ -217,3 +260,11 @@ fetch(`${config.baseURL}/cards `, {
       placesList.append(card);
     })
   })
+
+  function isRenderingFunc(btn, isRendering) {
+    if (isRendering) {
+      btn.textContent = 'Сохранение...'
+    } else {
+      btn.textContent = 'Сохранить'
+    }
+  }

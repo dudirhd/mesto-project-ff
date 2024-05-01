@@ -42,6 +42,10 @@
   display: inline;
 }
 
+.link-avatar-input-error-active {
+  display: inline;
+}
+
 @media screen and (max-width: 568px) {
   .popup__title {
     font-size: 12px;
