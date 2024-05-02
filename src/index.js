@@ -1,13 +1,9 @@
 import './pages/index.css';
 import { createCard, deleteCardFunction, cardLikeFunc } from './scripts/createCard.js';
 import {openPopupFunc, closePopupFunc, closePopupByOverlay} from './scripts/popupFuncs.js';
+import { getUser, getAllCards, changeAvatar, newCardFunc, changeName } from './scripts/api.js'
 //дом - карточки
 const placesList = document.querySelector('.places__list');
-//инициализация карточек
-// initialCards.forEach(item => {
-//   const card = createCard(item, deleteCardFunction, cardPopupFunc, cardLikeFunc);
-//   placesList.append(card);
-// })
 //Дом для кнопок и попапов
 const editButton = document.querySelector('.profile__edit-button');
 const popupEdit = document.querySelector('.popup_type_edit');
@@ -49,18 +45,11 @@ function handleFormSubmitInfo(evt) {
   isRenderingFunc(evt.submitter, true)
   document.querySelector('.profile__title').textContent = nameInput.value;
   document.querySelector('.profile__description').textContent = jobInput.value;
-  fetch('https://nomoreparties.co/v1/wff-cohort-12/users/me', {
-    method: 'PATCH',
-    headers: {
-      authorization: '27e1782a-9848-48d5-811f-a412253546cd',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      name: nameInput.value,
-      about: jobInput.value
-    })
-  }) 
-    .then(res => res.json())
+  const newNameObj = ({  
+    name: nameInput.value,
+    about: jobInput.value
+  })
+  changeName(newNameObj)
     .then((result) => {
       isRenderingFunc(evt.submitter, false)
       console.log(result);
@@ -75,60 +64,29 @@ function handleFormSubmitCard(evt) {
     name: cardNewName.value,
     link: cardNewUrl.value
   })
-  
-  fetch('https://nomoreparties.co/v1/wff-cohort-12/cards', {
-    method: 'POST',    
-    headers: {
-      authorization: '27e1782a-9848-48d5-811f-a412253546cd',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      name: cardNewName.value,
-      link: cardNewUrl.value
-    })
-  })
-    .then(res => res.json())
-    .then((result) => {
-      console.log(result)
+  newCardFunc(objNewCard)
+    .then((result) => { 
+      const newCard = createCard(result, deleteCardFunction);
+      placesList.prepend(newCard);
       isRenderingFunc(evt.submitter, false)
     })
-    .catch((error) => {
-      console.log(error)
-    })
-  const newCard = createCard(objNewCard, deleteCardFunction);
-  placesList.prepend(newCard);
   closePopupFunc(popupNewCard);
 }
 const newAvatarUrl = document.querySelector('.popup__input_type_url-avatar')
 const profileImage = document.querySelector('.profile__image')
 const editAvatarPopup = document.querySelector('.popup_type_edit-avatar')
 const formAvatar = newAvatarUrl.closest('.popup__form')
+//Поменять Аватарку
 function handleFormChangeAvatar(evt) {
   evt.preventDefault();
   console.log('thaTSIT')
   const newAvatar = newAvatarUrl.value
   isRenderingFunc(evt.submitter, true)
-  fetch('https://nomoreparties.co/v1/wff-cohort-12/users/me/avatar', {
-    method: 'PATCH',    
-    headers: {
-      'Content-Type': 'application/json',
-      'authorization': '27e1782a-9848-48d5-811f-a412253546cd'
-    },
-    body: JSON.stringify({
-      avatar: newAvatar
-    })
-  })
-    .then((res) => {
-      console.log(res)
-      res.json()
-    })
+  changeAvatar(newAvatar)
     .then((result) => {
       console.log(result)
       profileImage.style = `background-image: url(${newAvatar})`;
       isRenderingFunc(evt.submitter, false)
-    })
-    .catch((error) => {
-      console.log(error)
     })
   closePopupFunc(editAvatarPopup);
 }
@@ -153,14 +111,7 @@ export function cardPopupFunc(evt) {
   openPopupFunc(cardPopup);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////Проверка валидности форм
-
-
-
-// const changeProfileForm = document.querySelector('.edit-profile-popup__form')
-// const nameInputError = document.querySelector('.name-input-error')
-// const descriptionInputError = document.querySelector('.description-input-error')
-
+//Проверка валидности форм
 const isValid = (formElement, inputElement) => {
   if (!inputElement.validity.valid) {
     showInputError(formElement, inputElement, inputElement.validationMessage);
@@ -219,47 +170,20 @@ function toggleButtonState(inputList, buttonElement) {
     buttonElement.classList.remove('popup__button_inactive');
   }
 }
-
-
-///////////////////////////////////////////////////////////////////////// Перенести потом в другой файл(api.js)
-//Конфиг
-const config = {
-  baseURL: 'https://nomoreparties.co/v1/wff-cohort-12',
-  headers: {
-    'Content-Type': 'application/json',
-    'authorization': '27e1782a-9848-48d5-811f-a412253546cd'
-  },
-  methodGet: 'GET',
-  methodPost: 'POST'
-}
-
-//запрос профиля по токену
-
-fetch(`${config.baseURL}/users/me `, {
-  headers: config.headers,
-  method: config.methodGet
-})
-.then(res => res.json())
-.then((result) => {
-  //Замена данными из запроса
-  console.log(result)
-  profileTitle.textContent = result.name;
-  profileDescription.textContent = result.about
-  profileImage.style = `background-image: url(${result.avatar})`;
-}); 
-//Все карточки
-fetch(`${config.baseURL}/cards `, {
-  headers: config.headers,
-  method: config.methodGet
-})
-  .then(res => res.json())
-  .then((result) => {
-    console.log(result)
-    result.forEach((item) => {
+//Промис одновременно юзерДаты и карточек
+Promise.all([getUser(), getAllCards()])
+  .then(([userData, cardsData]) => {
+    //Замена данными из запроса
+    profileTitle.textContent = userData.name;
+    profileDescription.textContent = userData.about
+    profileImage.style = `background-image: url(${userData.avatar})`;
+    console.log(cardsData)
+    //Инициализация карточек
+    cardsData.forEach((item) => {
       const card = createCard(item, deleteCardFunction, cardPopupFunc, cardLikeFunc);
       placesList.append(card);
     })
-  })
+  });
 
   function isRenderingFunc(btn, isRendering) {
     if (isRendering) {
