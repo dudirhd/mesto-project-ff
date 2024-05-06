@@ -1,11 +1,8 @@
-import { error } from "jquery";
-import { cardPopupFunc } from "..";
-import { openPopupFunc } from "./popupFuncs";
 import { deleteCardRequest, cardLikeRequest } from "./api";
 
 export const cardTemplate = document.querySelector('#card-template').content;
 
-export function createCard(item, deleteCardFunction, openPopupFunc, cardLikeFunc) {
+export function createCard(item, id, deleteCardFunction, openPopupFunc, cardLikeFunc) {
   const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
   const cardImage = cardElement.querySelector('.card__image');
   const deleteButton = cardElement.querySelector('.card__delete-button');
@@ -13,23 +10,24 @@ export function createCard(item, deleteCardFunction, openPopupFunc, cardLikeFunc
   const cardLike = cardElement.querySelector('.card__like-button');
   const cardLikeNum = cardElement.querySelector('.card__like-num');
   const likesNum = item.likes.length || 0;
-  if (item.owner.name == 'Dmitriy Ermolenko') {
+  if (item.owner._id === id) {
     deleteButton.addEventListener('click', deleteCardFunction);
   } else {
     deleteButton.style.display = 'none'
   }
 
   function isLikedByMeFunc(like) {
-    if (like.name === 'Dmitriy Ermolenko') {
+    if (like._id === id) {
       return true
     }
-  } 
+  }
+
   const isLikedByMe = item.likes.some(isLikedByMeFunc)
   if (isLikedByMe) {
     cardLike.classList.add('card__like-button_is-active')
   }
   cardLike.addEventListener('click', function() {
-    cardLikeFunc(cardLike, cardElement)
+    cardLikeFunc(cardLike, cardElement, likesNum)
   });
 
   cardElement.id = item._id;
@@ -51,9 +49,8 @@ export function deleteCardFunction(evt) {
 export function cardLikeFunc(likeButton, cardElement) {
   const isCardLiked = likeButton.classList.contains('card__like-button_is-active');
   cardLikeRequest(isCardLiked, cardElement.id)
-    .then((result) => {
-      const likesNum = result.likes.length; 
-      cardElement.querySelector('.card__like-num').textContent = likesNum;
+    .then((result) => {    
       likeButton.classList.toggle('card__like-button_is-active');
-    })
+      cardElement.querySelector('.card__like-num').textContent = result.likes.length;
+    }).catch(error => console.log(error))
 }

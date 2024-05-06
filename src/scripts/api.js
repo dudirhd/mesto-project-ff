@@ -12,7 +12,7 @@ function responseJson(res) {
   if (res.ok) {
     return res.json()
   } else {
-    return console.log('ОШИБКА')
+    return Promise.reject(res.status);
   }
 }
 
@@ -21,7 +21,6 @@ export function getUser() {
     headers: config.headers,
     method: config.methodGet
   }).then(responseJson)
-  .catch(error => console.log(error)) 
 }
 
 export function getAllCards() {
@@ -29,7 +28,6 @@ export function getAllCards() {
     headers: config.headers,
     method: config.methodGet,
   }).then(responseJson)
-  .catch(error => console.log(error))
 }
 
 export function changeAvatar(avatar) {
@@ -37,7 +35,6 @@ export function changeAvatar(avatar) {
     headers: config.headers,
     method: 'PATCH'
   }).then(responseJson)
-  .catch(error => console.log(error)) 
 }
 
 export function newCardFunc(obj) {
@@ -46,7 +43,6 @@ export function newCardFunc(obj) {
     headers: config.headers,
     body: JSON.stringify(obj)
   }).then(responseJson)
-  .catch(error => console.log(error))  
 }
 
 export function changeName(obj) {
@@ -55,7 +51,6 @@ export function changeName(obj) {
     headers: config.headers,
     body: JSON.stringify(obj)
   }).then(responseJson)
-  .catch(error => console.log(error)) 
 }
 
 export function deleteCardRequest(id) {
@@ -63,21 +58,18 @@ export function deleteCardRequest(id) {
     method: 'DELETE',
     headers: config.headers
   })
-  .catch(error => console.log(error))
 }
 
 export function cardLikeRequest(flag, id) {
-  if (flag) {
+  if (!flag) {
     return fetch(`${config.baseURL}/cards/likes/${id}`, {
       method: 'PUT',
       headers: config.headers
     }).then(responseJson)
-    .catch(error => console.log(error))
   } else {
     return fetch(`${config.baseURL}/cards/likes/${id}`, {
       method: 'DELETE',
       headers: config.headers
     }).then(responseJson)
-    .catch(error => console.log(error))
   }
 }

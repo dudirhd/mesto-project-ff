@@ -23,27 +23,6 @@
   font-size: 0.75em;
   font-weight: 400;
   height: 0.75em;
-  display: none;
-}
-
-.name-input-error-active {
-  display: inline;
-}
-
-.description-input-error-active {
-  display: inline;
-}
-
-.place-name-input-error-active {
-  display: inline;
-}
-
-.link-input-error-active {
-  display: inline;
-}
-
-.link-avatar-input-error-active {
-  display: inline;
 }
 
 @media screen and (max-width: 568px) {
