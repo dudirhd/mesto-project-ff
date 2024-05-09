@@ -33,7 +33,10 @@ export function getAllCards() {
 export function changeAvatar(avatar) {
   return fetch(`${config.baseURL}/users/me/avatar`, {
     headers: config.headers,
-    method: 'PATCH'
+    method: 'PATCH',
+    body: JSON.stringify({
+      avatar: avatar
+    })
   }).then(responseJson)
 }
 

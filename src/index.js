@@ -75,23 +75,20 @@ function handleFormSubmitCard(evt) {
   })
   newCardFunc(objNewCard)
     .then((result) => { 
-      const newCard = createCard(result, deleteCardFunction);
+      const newCard = createCard(result, userID,  deleteCardFunction, cardPopupFunc, cardLikeFunc);
       placesList.prepend(newCard);  
       closePopupFunc(popupNewCard);
     })
     .catch(error => console.log(error)) 
     .finally(() => isRenderingFunc(evt.submitter, false))
 }
-
 //Поменять Аватарку
 function handleFormChangeAvatar(evt) {
   evt.preventDefault();
-  console.log('thaTSIT')
   const newAvatar = newAvatarUrl.value
   isRenderingFunc(evt.submitter, true)
   changeAvatar(newAvatar)
     .then((result) => {
-      console.log(result)
       profileImage.style = `background-image: url(${newAvatar})`; 
       closePopupFunc(editAvatarPopup);
     })
@@ -132,18 +129,18 @@ enableValidation(validationConfig);
 Promise.all([getUser(), getAllCards()])
   .then(([userData, cardsData]) => {
     //Замена данными из запроса
-    console.log(userData)
     profileTitle.textContent = userData.name;
-    profileDescription.textContent = userData.about
+    profileDescription.textContent = userData.about;
+    userID = userData._id;
     profileImage.style = `background-image: url(${userData.avatar})`;
-    console.log(cardsData)
     //Инициализация карточек
     cardsData.forEach((item) => {
-      const card = createCard(item, userData._id, deleteCardFunction, cardPopupFunc, cardLikeFunc);
+      const card = createCard(item, userID, deleteCardFunction, cardPopupFunc, cardLikeFunc);
       placesList.append(card);
-    })
+    })   
   })
   .catch(error => console.log(error)) 
+  let userID = ""
 //Процесс
   function isRenderingFunc(btn, isRendering) {
     if (isRendering) {

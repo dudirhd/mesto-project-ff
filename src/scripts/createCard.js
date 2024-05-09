@@ -27,7 +27,7 @@ export function createCard(item, id, deleteCardFunction, openPopupFunc, cardLike
     cardLike.classList.add('card__like-button_is-active')
   }
   cardLike.addEventListener('click', function() {
-    cardLikeFunc(cardLike, cardElement, likesNum)
+    cardLikeFunc(cardLike, cardElement, cardLikeNum)
   });
 
   cardElement.id = item._id;
@@ -46,11 +46,11 @@ export function deleteCardFunction(evt) {
     .catch(error => console.log(error))
 }
 
-export function cardLikeFunc(likeButton, cardElement) {
+export function cardLikeFunc(likeButton, cardElement, cardLikeNum) {
   const isCardLiked = likeButton.classList.contains('card__like-button_is-active');
   cardLikeRequest(isCardLiked, cardElement.id)
     .then((result) => {    
       likeButton.classList.toggle('card__like-button_is-active');
-      cardElement.querySelector('.card__like-num').textContent = result.likes.length;
+      cardLikeNum.textContent = result.likes.length;
     }).catch(error => console.log(error))
 }
